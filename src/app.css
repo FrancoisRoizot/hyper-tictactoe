@@ -91,6 +91,14 @@ button:focus-visible {
   height: 100%;
 }
 
+.holder {
+  position: relative;
+}
+
+.tiktaktoe-board {
+  border-collapse: collapse;
+}
+
 .tiktaktoe-board > tr > td {
   border-top: 3px solid #f0f0f0;
   border-left: 3px solid #f0f0f0;
@@ -106,4 +114,40 @@ button:focus-visible {
 
 .tiktaktoe-board > tr > td:first-child {
   border-left: none;
+}
+
+.parent > tr > td {
+  border-top: 7px solid #f0f0f0;
+  border-left: 7px solid #f0f0f0;
+  padding: 20px;
+}
+
+tr:first-child > td {
+  border-top: none;
+}
+
+.parent td:first-child {
+  border-left: none;
+}
+
+.holder.green {
+  background-color: #0f01;
+}
+
+.big-one {
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 8em;
+}
+
+.child > tr > td {
+  width: 75px;
+  height: 75px;
 }

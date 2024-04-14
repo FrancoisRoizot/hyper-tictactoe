@@ -11,13 +11,13 @@ const gameStates = {
 }
 
 const createBoard = (size, main = true) => Array(size).fill().map((_, x) => Array(size).fill().map((__, y) =>
-    main ? {
-        board: createBoard(size, false),
-        status: gameStates.pending,
-        winPosition: null,
-        coords: {x, y},
-        value: ''
-    } : { value: '' }
+main ? {
+    board: createBoard(size, false),
+    status: gameStates.pending,
+    winPosition: null,
+    coords: {x, y},
+    value: ''
+} : { value: '' }
 ))
 
 const createGame = () => {
@@ -30,21 +30,25 @@ const createGame = () => {
     })
 
     const play = (row, col, { isMain, x = null, y = null }) => update(game => {
+        if (!isMain && !checkNextPlay(x, y, game.nextCoords)) {
+            return game
+        }
+
         const playedBoard = isMain ? game : game.board[x][y]
-        if (game.board[row][col].value == '' && game.status === gameStates.pending) {
-            game.board[row][col].value = game.currentPlayer
-            const newState = checkGameStatus(game.board);
-            game.status = newState.state
-            if (game.status) {
-                if (isMain) {
-                    //TODO: check si la case est jouable
-                    game.nextCoords = { x: row, y: col }
-                } else {
+        if (playedBoard.board[row][col].value == '' && playedBoard.status === gameStates.pending) {
+            playedBoard.board[row][col].value = game.currentPlayer
+            const newState = checkGameStatus(playedBoard.board);
+            playedBoard.status = newState.state
+            if (playedBoard.status) {
+                if (!isMain) {
                     play(x, y, { isMain: true })
                 }
-                game.winPosition = newState.line ?? null;
+                playedBoard.winPosition = newState.line ?? null;
             } else {
                 game.currentPlayer = game.currentPlayer === config.playerA ? config.playerB : config.playerA;
+            }
+            if (!isMain) {
+                game.nextCoords = game.board[row][col].status === gameStates.pending ? { x: row, y: col } : { x: null, y: null }
             }
         }
 
@@ -54,6 +58,7 @@ const createGame = () => {
     return { subscribe, play }
 }
 
+const checkNextPlay = (x, y, coords) => x === coords.x && y === coords.y || coords.x === null
 
 function checkGameStatus(board) {
     let filledTiles = 0;
@@ -89,33 +94,31 @@ const getWinTypeStyle = (winType, position) => {
     let direction = '';
     switch (winType) {
         case gameStates.diagonal:
-        direction = 'right top';
-        break;
+            direction = 'right top';
+            break;
         case gameStates.reverseDiagonal:
-        direction = 'left top';
-        break;
+            direction = 'left top';
+            break;
         case gameStates.horizontal:
-        direction = 'top';
-        break;
+            direction = 'top';
+            break;
         case gameStates.vertical:
-        direction = 'left';
-        break;
+            direction = 'left';
+            break;
     }
 
     let linePosition = 49;
-    if (winType === gameStates.horizontal || winType === gameStates.vertical) {
-        switch (position) {
-            case 0:
+    switch (position) {
+        case 0:
             linePosition = 83;
             break;
-            case 2:
+        case 2:
             linePosition = 16;
             break;
-        }
     }
 
     if (direction) {
-        return `background: linear-gradient(to ${direction}, transparent 0%, transparent ${linePosition}%, red ${linePosition}%, red ${linePosition + 1}%, transparent ${linePosition + 1}%, transparent 100%);`;
+        return `background: linear-gradient(to ${direction}, transparent 0%, transparent ${linePosition}%, red ${linePosition}%, red ${linePosition + 2}%, transparent ${linePosition + 2}%, transparent 100%);`;
     }
 
     return '';
