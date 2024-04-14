@@ -29,6 +29,16 @@ const createGame = () => {
         winPosition: null,
     })
 
+    const resetGame = () => update(game => {
+        game.board = createBoard(config.boardSize)
+        game.status = gameStates.pending
+        game.currentPlayer = config.playerA
+        game.nextCoords = {x: null, y: null}
+        game.winPosition = null
+
+        return game
+    })
+
     const play = (row, col, { isMain, x = null, y = null }) => update(game => {
         if (!isMain && !checkNextPlay(x, y, game.nextCoords)) {
             return game
@@ -55,7 +65,7 @@ const createGame = () => {
         return game
     })
 
-    return { subscribe, play }
+    return { subscribe, play, resetGame }
 }
 
 const checkNextPlay = (x, y, coords) => x === coords.x && y === coords.y || coords.x === null
