@@ -1,0 +1,11 @@
+
+services:
+  npm:
+    image: node:18
+    volumes:
+      - .:/app
+    ports:
+      - 3000:3000
+    stdin_open: true
+    working_dir: /app
+    tty: true
