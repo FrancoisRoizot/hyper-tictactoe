@@ -95,11 +95,11 @@ button:focus-visible {
   position: relative;
 }
 
-.tiktaktoe-board {
+.tictactoe-board {
   border-collapse: collapse;
 }
 
-.tiktaktoe-board > tr > td {
+.tictactoe-board > tr > td {
   border-top: 3px solid #f0f0f0;
   border-left: 3px solid #f0f0f0;
   text-align: center;
@@ -108,11 +108,11 @@ button:focus-visible {
   cursor: pointer;
 }
 
-.tiktaktoe-board > tr:first-child > td {
+.tictactoe-board > tr:first-child > td {
   border-top: none;
 }
 
-.tiktaktoe-board > tr > td:first-child {
+.tictactoe-board > tr > td:first-child {
   border-left: none;
 }
 

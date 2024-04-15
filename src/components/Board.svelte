@@ -10,7 +10,7 @@
 </script>
 
 <div class="game-container">
-  <table class="tiktaktoe-board {isMain ? 'parent' : 'child' }">
+  <table class="tictactoe-board {isMain ? 'parent' : 'child' }">
     {#each playedBoard.board as row, i}
     <tr>
       {#each row as cell, j}
