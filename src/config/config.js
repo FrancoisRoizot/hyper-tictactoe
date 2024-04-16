@@ -1,7 +1,7 @@
 
 const config = {
     boardSize: 3,
-    winningStreak: 3,
+    clearDrawBoard: true,
     playerA: '⚫',
     playerB: '⚪',
 }

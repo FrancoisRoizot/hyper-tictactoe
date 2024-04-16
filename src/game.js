@@ -50,17 +50,25 @@ const createGame = () => {
             const newState = checkGameStatus(playedBoard.board);
             playedBoard.status = newState.state
             if (playedBoard.status) {
-                if (!isMain) {
+                if (playedBoard.status === gameStates.draw) {
+                    config.clearDrawBoard && (playedBoard.board = createBoard(config.boardSize, false))
+                } else if (!isMain) {
                     play(x, y, { isMain: true })
                 }
                 playedBoard.winPosition = newState.line ?? null;
             } else {
-                game.currentPlayer = game.currentPlayer === config.playerA ? config.playerB : config.playerA;
+                nextPlayer()
             }
             if (!isMain) {
                 game.nextCoords = game.board[row][col].status === gameStates.pending ? { x: row, y: col } : { x: null, y: null }
             }
         }
+
+        return game
+    })
+
+    const nextPlayer = () => update(game => {
+        game.currentPlayer = game.currentPlayer === config.playerA ? config.playerB : config.playerA
 
         return game
     })
