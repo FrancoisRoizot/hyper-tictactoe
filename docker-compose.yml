@@ -1,7 +1,6 @@
-
 services:
   npm:
-    image: node:18
+    image: node:22
     volumes:
       - .:/app
     ports:
@@ -9,3 +8,4 @@ services:
     stdin_open: true
     working_dir: /app
     tty: true
+    entrypoint: npm run dev
