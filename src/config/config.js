@@ -1,7 +1,5 @@
 
 const config = {
-    boardSize: 3,
-    clearDrawBoard: true,
     playerA: '⚫',
     playerB: '⚪',
 }

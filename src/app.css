@@ -144,7 +144,19 @@ tr:first-child > td {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 8em;
+}
+
+.big-one.simple {
+  font-size: 5em;
+}
+
+.big-one:not(.simple) {
+  font-size: 7em;
+}
+
+.holder:has(.big-one) {
+  min-width: 150px;
+  height: 150px;
 }
 
 .child > tr > td {

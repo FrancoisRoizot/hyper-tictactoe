@@ -10,31 +10,83 @@ const gameStates = {
     draw: 5,
 }
 
-const createBoard = (size, main = true) => Array(size).fill().map((_, x) => Array(size).fill().map((__, y) =>
-main ? {
-    board: createBoard(size, false),
-    status: gameStates.pending,
-    winPosition: null,
-    coords: {x, y},
-    value: ''
-} : { value: '' }
-))
+const gameModes = {
+    hyperTikTakToe: {
+        hasChild: true,
+        play(playedBoard, { isMain, x, y }, playCallback) {
+            if (!playedBoard.status) {
+                return
+            }
+
+            if (playedBoard.status === gameStates.draw) {
+                playedBoard.board = createBoard(false)
+            } else if (!isMain) {
+                playCallback()
+            }
+        },
+        reset() {
+
+        }
+    },
+    ghostTikTakToe: {
+        hasChild: false,
+        history: [],
+        play(playedBoard, { isMain, row: x, col: y }, playCallback) {
+            this.history.push({x, y})
+
+            if (this.history.length > 5) {
+                const coord = this.history.shift()
+                playedBoard.board[coord.x][coord.y].value = ''
+            }
+        },
+        reset() {
+            this.history = []
+        }
+    },
+}
+
+const createBoard = hasChild =>
+    Array(3).fill().map((_, x) =>
+        Array(3).fill().map((__, y) =>
+            hasChild ? {
+                board: createBoard(false),
+                status: gameStates.pending,
+                winPosition: null,
+                coords: {x, y},
+                value: ''
+            } : { value: '' }
+        ))
 
 const createGame = () => {
+
     const {subscribe, set, update} = writable({
         status: gameStates.pending,
-        board: createBoard(config.boardSize),
+        board: createBoard(gameModes.ghostTikTakToe.hasChild),
         currentPlayer: config.playerA,
         nextCoords: {x: null, y: null},
         winPosition: null,
+        currentGameMode: 'ghostTikTakToe',
+        hasChild: gameModes.ghostTikTakToe.hasChild,
+        gameModes,
+    })
+
+    const changeGameMode = gameMode => update(game => {
+        game.currentGameMode = gameMode
+        resetGame()
+
+        return game
     })
 
     const resetGame = () => update(game => {
-        game.board = createBoard(config.boardSize)
+        console.log(gameModes[game.currentGameMode])
+        game.board = createBoard(gameModes[game.currentGameMode].hasChild)
         game.status = gameStates.pending
         game.currentPlayer = config.playerA
         game.nextCoords = {x: null, y: null}
         game.winPosition = null
+        game.hasChild = gameModes[game.currentGameMode].hasChild
+
+        gameModes[game.currentGameMode].reset()
 
         return game
     })
@@ -49,16 +101,14 @@ const createGame = () => {
             playedBoard.board[row][col].value = game.currentPlayer
             const newState = checkGameStatus(playedBoard.board);
             playedBoard.status = newState.state
+            gameModes[game.currentGameMode].play(playedBoard, { isMain, row, col }, () => play(x, y, { isMain: true }))
+
             if (playedBoard.status) {
-                if (playedBoard.status === gameStates.draw) {
-                    config.clearDrawBoard && (playedBoard.board = createBoard(config.boardSize, false))
-                } else if (!isMain) {
-                    play(x, y, { isMain: true })
-                }
                 playedBoard.winPosition = newState.line ?? null;
             } else {
                 nextPlayer()
             }
+
             if (!isMain) {
                 game.nextCoords = game.board[row][col].status === gameStates.pending ? { x: row, y: col } : { x: null, y: null }
             }
@@ -73,7 +123,7 @@ const createGame = () => {
         return game
     })
 
-    return { subscribe, play, resetGame }
+    return { subscribe, play, resetGame, changeGameMode }
 }
 
 const checkNextPlay = (x, y, coords) => x === coords.x && y === coords.y || coords.x === null
@@ -105,7 +155,7 @@ function checkGameStatus(board) {
         return { state: gameStates.reverseDiagonal };
     }
 
-    return { state: gameStates.pending};
+    return { state: gameStates.pending };
 }
 
 const getWinTypeStyle = (winType, position) => {
